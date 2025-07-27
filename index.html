@@ -33,21 +33,43 @@
       padding: 1.5rem;
       width: 480px;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      position: relative;
     }
-    .card h2 { color: #fff; font-size: 1.2rem; }
-    canvas { margin-top: 1rem; }
+    .card h2 {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .badge {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background-color: #4fc3f7;
+      color: #000;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .badge.mock {
+      background-color: #888;
+      color: #eee;
+    }
+    canvas {
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
   <header><h1>📊 AICharts – Live AI Benchmarks</h1></header>
   <div class="container">
-    <div class="card"><h2>🧠 Chat LLMs</h2><canvas id="llmChart" height="200"></canvas></div>
-    <div class="card"><h2>📚 Reasoning</h2><canvas id="reasoningChart" height="200"></canvas></div>
-    <div class="card"><h2>💻 Coding</h2><canvas id="codingChart" height="200"></canvas></div>
-    <div class="card"><h2>🤖 Agents</h2><canvas id="agentChart" height="200"></canvas></div>
-    <div class="card"><h2>🎨 Image Generation</h2><canvas id="imageChart" height="200"></canvas></div>
-    <div class="card"><h2>🎥 Video Generation</h2><canvas id="videoChart" height="200"></canvas></div>
-    <div class="card"><h2>📦 Robotics</h2><canvas id="roboticsChart" height="200"></canvas></div>
+    <div class="card" id="llmCard"><h2>🧠 Chat LLMs</h2><span class="badge" id="llmBadge">Loading...</span><canvas id="llmChart" height="200"></canvas></div>
+    <div class="card"><h2>📚 Reasoning</h2><span class="badge mock">Mock</span><canvas id="reasoningChart" height="200"></canvas></div>
+    <div class="card"><h2>💻 Coding</h2><span class="badge mock">Mock</span><canvas id="codingChart" height="200"></canvas></div>
+    <div class="card"><h2>🤖 Agents</h2><span class="badge mock">Mock</span><canvas id="agentChart" height="200"></canvas></div>
+    <div class="card"><h2>🎨 Image Generation</h2><span class="badge mock">Mock</span><canvas id="imageChart" height="200"></canvas></div>
+    <div class="card"><h2>🎥 Video Generation</h2><span class="badge mock">Mock</span><canvas id="videoChart" height="200"></canvas></div>
+    <div class="card"><h2>📦 Robotics</h2><span class="badge mock">Mock</span><canvas id="roboticsChart" height="200"></canvas></div>
   </div>
 
   <script>
@@ -66,8 +88,22 @@
       });
     };
 
-    // Example top 5 contenders per category (mocked data)
-    makeChart('llmChart', ['GPT-4o', 'Claude 3.5', 'Gemini 1.5 Pro', 'DeepSeek-V2', 'Command R+'], [95, 93, 91, 89, 87], '#4fc3f7');
+    // LLM chart from live API
+    fetch('/api/llm')
+      .then(res => res.json())
+      .then(data => {
+        makeChart('llmChart', data.models, data.scores, '#4fc3f7');
+        document.getElementById('llmBadge').innerText = 'Live';
+        document.getElementById('llmBadge').classList.remove('mock');
+      })
+      .catch(err => {
+        console.error('LLM fetch failed, fallback to mock', err);
+        makeChart('llmChart', ['GPT-4o', 'Claude 3.5', 'Gemini 1.5 Pro', 'DeepSeek-V2', 'Command R+'], [95, 93, 91, 89, 87], '#4fc3f7');
+        document.getElementById('llmBadge').innerText = 'Mock';
+        document.getElementById('llmBadge').classList.add('mock');
+      });
+
+    // All others = mock for now
     makeChart('reasoningChart', ['Gemini 2.5', 'GPT-4o', 'Claude Opus', 'Yi-1.5', 'Mistral-MoE'], [21.6, 20.3, 10.7, 9.8, 7.9], '#ffb74d');
     makeChart('codingChart', ['Claude Opus', 'o1-mini', 'Grok 4', 'GPT-4 Turbo', 'StarCoder2'], [88.2, 84.2, 81.9, 80.5, 77.0], '#81c784');
     makeChart('agentChart', ['Toolformer', 'Auto-GPT', 'GPT-Engineer', 'OpenDevin', 'Agent-1.5'], [62.3, 55.1, 59.2, 53.8, 51.6], '#ba68c8');
