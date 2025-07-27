@@ -1,0 +1,87 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AICharts – Live Benchmarks</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1e1e2f;
+      color: #e0e0f0;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #12121c;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 2rem;
+      gap: 1.5rem;
+    }
+    .card {
+      background: #2a2a40;
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .card h2 { color: #fff; font-size: 1.2rem; }
+    canvas { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <header><h1>📊 AICharts – Live AI Benchmarks</h1></header>
+  <div class="container">
+    <div class="card"><h2>🧠 GPQA Benchmark</h2><canvas id="gpqaChart" height="200"></canvas></div>
+    <div class="card"><h2>💻 LiveCodeBench</h2><canvas id="codeChart" height="200"></canvas></div>
+    <div class="card"><h2>🔧 BFCL Tool Use</h2><canvas id="bfclChart" height="200"></canvas></div>
+  </div>
+
+  <script>
+    const makeChart = (id, label, score, color) => {
+      new Chart(document.getElementById(id), {
+        type: 'bar',
+        data: {
+          labels: [label],
+          datasets: [{ label: 'Score', data: [score], backgroundColor: color }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true, max: 100 }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    };
+
+    async function fetchAndRender() {
+      try {
+        const gpqa = await fetch('/api/gpqa').then(res => res.json());
+        makeChart('gpqaChart', gpqa.model, gpqa.score, '#4fc3f7');
+
+        const code = await fetch('/api/livecode').then(res => res.json());
+        makeChart('codeChart', code.model, code.passAt1, '#81c784');
+
+        const bfcl = await fetch('/api/bfcl').then(res => res.json());
+        makeChart('bfclChart', bfcl.model, bfcl.accuracy, '#ba68c8');
+
+      } catch (err) {
+        console.error('❌ Failed to load data:', err);
+      }
+    }
+
+    fetchAndRender();
+  </script>
+</body>
+</html>
