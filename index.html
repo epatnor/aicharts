@@ -31,7 +31,7 @@
       background: #2a2a40;
       border-radius: 12px;
       padding: 1.5rem;
-      width: 400px;
+      width: 480px;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
     .card h2 { color: #fff; font-size: 1.2rem; }
@@ -41,47 +41,39 @@
 <body>
   <header><h1>📊 AICharts – Live AI Benchmarks</h1></header>
   <div class="container">
-    <div class="card"><h2>🧠 GPQA Benchmark</h2><canvas id="gpqaChart" height="200"></canvas></div>
-    <div class="card"><h2>💻 LiveCodeBench</h2><canvas id="codeChart" height="200"></canvas></div>
-    <div class="card"><h2>🔧 BFCL Tool Use</h2><canvas id="bfclChart" height="200"></canvas></div>
+    <div class="card"><h2>🧠 Chat LLMs</h2><canvas id="llmChart" height="200"></canvas></div>
+    <div class="card"><h2>📚 Reasoning</h2><canvas id="reasoningChart" height="200"></canvas></div>
+    <div class="card"><h2>💻 Coding</h2><canvas id="codingChart" height="200"></canvas></div>
+    <div class="card"><h2>🤖 Agents</h2><canvas id="agentChart" height="200"></canvas></div>
+    <div class="card"><h2>🎨 Image Generation</h2><canvas id="imageChart" height="200"></canvas></div>
+    <div class="card"><h2>🎥 Video Generation</h2><canvas id="videoChart" height="200"></canvas></div>
+    <div class="card"><h2>📦 Robotics</h2><canvas id="roboticsChart" height="200"></canvas></div>
   </div>
 
   <script>
-    const makeChart = (id, label, score, color) => {
+    const makeChart = (id, labels, scores, color) => {
       new Chart(document.getElementById(id), {
         type: 'bar',
         data: {
-          labels: [label],
-          datasets: [{ label: 'Score', data: [score], backgroundColor: color }]
+          labels: labels,
+          datasets: [{ label: 'Score', data: scores, backgroundColor: color }]
         },
         options: {
-          scales: {
-            y: { beginAtZero: true, max: 100 }
-          },
-          plugins: {
-            legend: { display: false }
-          }
+          indexAxis: 'y',
+          scales: { x: { beginAtZero: true, max: 100 } },
+          plugins: { legend: { display: false } }
         }
       });
     };
 
-    async function fetchAndRender() {
-      try {
-        const gpqa = await fetch('/api/gpqa').then(res => res.json());
-        makeChart('gpqaChart', gpqa.model, gpqa.score, '#4fc3f7');
-
-        const code = await fetch('/api/livecode').then(res => res.json());
-        makeChart('codeChart', code.model, code.passAt1, '#81c784');
-
-        const bfcl = await fetch('/api/bfcl').then(res => res.json());
-        makeChart('bfclChart', bfcl.model, bfcl.accuracy, '#ba68c8');
-
-      } catch (err) {
-        console.error('❌ Failed to load data:', err);
-      }
-    }
-
-    fetchAndRender();
+    // Example top 5 contenders per category (mocked data)
+    makeChart('llmChart', ['GPT-4o', 'Claude 3.5', 'Gemini 1.5 Pro', 'DeepSeek-V2', 'Command R+'], [95, 93, 91, 89, 87], '#4fc3f7');
+    makeChart('reasoningChart', ['Gemini 2.5', 'GPT-4o', 'Claude Opus', 'Yi-1.5', 'Mistral-MoE'], [21.6, 20.3, 10.7, 9.8, 7.9], '#ffb74d');
+    makeChart('codingChart', ['Claude Opus', 'o1-mini', 'Grok 4', 'GPT-4 Turbo', 'StarCoder2'], [88.2, 84.2, 81.9, 80.5, 77.0], '#81c784');
+    makeChart('agentChart', ['Toolformer', 'Auto-GPT', 'GPT-Engineer', 'OpenDevin', 'Agent-1.5'], [62.3, 55.1, 59.2, 53.8, 51.6], '#ba68c8');
+    makeChart('imageChart', ['Janus Pro', 'DALL·E 3', 'SDXL Turbo', 'Playground V2.5', 'BlueWillow'], [89.2, 84.3, 80.1, 78.9, 75.2], '#f06292');
+    makeChart('videoChart', ['Sora (GPT-4V)', 'Pika Labs', 'Runway Gen-3', 'Dream Machine', 'Moonvalley'], [82.4, 76.9, 71.2, 68.5, 64.8], '#9575cd');
+    makeChart('roboticsChart', ['RoboCat', 'RT-2', 'SayCan', 'PaLM-E', 'Open-X Embodied'], [45.3, 42.1, 38.6, 36.7, 34.4], '#7986cb');
   </script>
 </body>
 </html>
