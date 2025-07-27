@@ -14,24 +14,33 @@ def timestamp():
 
 # ========== LIVE SCRAPER: LLM Arena ==========
 
+# scraper.py (only the LLM part updated)
+
 def scrape_llm_arena():
     try:
         url = "https://arena.lmsys.org/"
         response = requests.get(url, timeout=10)
         soup = BeautifulSoup(response.text, "html.parser")
 
+        # New structure: top models are inside .leaderboard-container table rows
+        rows = soup.select("table tbody tr")
+        if not rows:
+            raise ValueError("No table rows found")
+
         models, scores = [], []
-        table = soup.find("table", {"class": "leaderboard-table"})
-        for row in table.select("tbody tr")[:5]:
+        for row in rows[:5]:
             cols = row.find_all("td")
             if len(cols) >= 3:
-                models.append(cols[1].text.strip())
-                scores.append(float(cols[2].text.strip()))
+                name = cols[1].get_text(strip=True)
+                score = float(cols[2].get_text(strip=True))
+                models.append(name)
+                scores.append(score)
 
         return {"models": models, "scores": scores, "timestamp": timestamp()}
     except Exception as e:
         print(f"⚠️ Failed to scrape LLM Arena: {e}")
         return fallback_llm()
+
 
 # ========== MOCK FALLBACKS FOR OTHER CATEGORIES ==========
 
