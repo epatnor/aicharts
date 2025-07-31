@@ -27,7 +27,7 @@ def scrape_epoch_reasoning():
         }
     except Exception as e:
         print(f"⚠️ Epoch MMLU failed: {e}")
-        return fallback_reasoning()
+        raise
 
 def scrape_epoch_coding():
     try:
