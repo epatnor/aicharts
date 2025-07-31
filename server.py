@@ -39,6 +39,10 @@ def livecode():
 def bfcl():
     return jsonify(load_json("bfcl"))
 
+@app.route("/styles.css")
+def styles():
+    return send_from_directory(".", "styles.css")
+
 @app.route("/")
 def dashboard():
     return send_from_directory(".", "index.html")
