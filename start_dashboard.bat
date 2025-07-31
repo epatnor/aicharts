@@ -2,26 +2,46 @@
 @echo off
 setlocal
 
-:: Activate virtual environment if it exists
+echo 🚀 Starting AICharts setup...
+
+:: Create and activate virtual environment if missing
 if exist venv\Scripts\activate.bat (
     call venv\Scripts\activate.bat
 ) else (
-    echo Creating virtual environment...
+    echo 📦 Creating virtual environment...
     python -m venv venv
-    call venv\Scripts\activate.bat
+    if exist venv\Scripts\activate.bat (
+        call venv\Scripts\activate.bat
+    ) else (
+        echo ❌ Failed to create virtual environment
+        exit /b 1
+    )
 )
 
-:: Install required packages
-pip install -r requirements.txt
+:: Upgrade pip (silently)
+python -m pip install --upgrade pip >nul
 
-:: Run scraper to fetch latest data
-python scraper.py
+:: Install required packages
+echo 📦 Installing dependencies...
+pip install -r requirements.txt || (
+    echo ❌ Failed to install packages
+    exit /b 1
+)
+
+:: Run scraper to fetch latest benchmark data
+echo 🧹 Running scraper...
+python scraper.py || (
+    echo ❌ Scraper failed
+    exit /b 1
+)
 
 :: Start backend server in a new console window
+echo 🌐 Starting server...
 start cmd /k "python server.py"
 
-:: Open the dashboard in default browser
+:: Open dashboard in browser after delay
 timeout /t 2 >nul
 start http://localhost:8000
 
+echo ✅ Done!
 endlocal
