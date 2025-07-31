@@ -15,6 +15,18 @@ def load_json(name):
             return json.load(f)
     return {"error": "Data not found"}
 
+@app.route("/api/llm")
+def llm():
+    return jsonify(load_json("llm"))
+
+@app.route("/api/reasoning")
+def reasoning():
+    return jsonify(load_json("reasoning"))
+
+@app.route("/api/coding")
+def coding():
+    return jsonify(load_json("coding"))
+
 @app.route("/api/gpqa")
 def gpqa():
     return jsonify(load_json("gpqa"))
