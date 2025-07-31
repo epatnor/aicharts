@@ -18,7 +18,10 @@ def timestamp():
 def scrape_epoch_reasoning():
     try:
         df = pd.read_csv("https://epoch.ai/data/all_ai_models.csv")
-        print("📋 Columns in CSV:", df.columns.tolist())  # 👈 Lägg tillfälligt denna rad
+        print("\n📋 Available columns in Epoch CSV:")
+        for col in df.columns:
+            print(f"  - {col}")
+        print()
         df = df.dropna(subset=["MMLU"])
         top = df.sort_values("MMLU", ascending=False).head(5)
         return {
@@ -34,6 +37,10 @@ def scrape_epoch_reasoning():
 def scrape_epoch_coding():
     try:
         df = pd.read_csv("https://epoch.ai/data/all_ai_models.csv")
+        print("\n📋 Available columns in Epoch CSV:")
+        for col in df.columns:
+            print(f"  - {col}")
+        print()
         df = df.dropna(subset=["HumanEval"])
         top = df.sort_values("HumanEval", ascending=False).head(5)
         return {
@@ -44,6 +51,7 @@ def scrape_epoch_coding():
     except Exception as e:
         print(f"⚠️ Epoch HumanEval failed: {e}")
         return fallback_coding()
+
 
 # ========== MOCK FALLBACKS ==========
 
