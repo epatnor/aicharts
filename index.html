@@ -1,21 +1,60 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AICharts – Live Benchmarks</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header><h1>📊 AICharts – Live AI Benchmarks</h1></header>
+  <header>
+    <h1>📊 AICharts – Live AI Benchmarks</h1>
+  </header>
+
   <div class="container">
-    <div class="card" id="llmCard"><h2>🧠 Chat LLMs</h2><span class="badge" id="llmBadge">Loading...</span><canvas id="llmChart" height="200"></canvas></div>
-    <div class="card"><h2>📚 Reasoning</h2><span class="badge mock" id="reasoningBadge">Mock</span><canvas id="reasoningChart" height="200"></canvas></div>
-    <div class="card"><h2>💻 Coding</h2><span class="badge mock" id="codingBadge">Mock</span><canvas id="codingChart" height="200"></canvas></div>
-    <div class="card"><h2>🤖 Agents</h2><span class="badge mock">Mock</span><canvas id="agentChart" height="200"></canvas></div>
-    <div class="card"><h2>🎨 Image Generation</h2><span class="badge mock">Mock</span><canvas id="imageChart" height="200"></canvas></div>
-    <div class="card"><h2>🎥 Video Generation</h2><span class="badge mock">Mock</span><canvas id="videoChart" height="200"></canvas></div>
-    <div class="card"><h2>📦 Robotics</h2><span class="badge mock">Mock</span><canvas id="roboticsChart" height="200"></canvas></div>
+    <div class="card" id="llmCard">
+      <h2>🧠 Chat LLMs</h2>
+      <span class="badge" id="llmBadge">Loading...</span>
+      <canvas id="llmChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>📚 Reasoning</h2>
+      <span class="badge mock" id="reasoningBadge">Mock</span>
+      <canvas id="reasoningChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>💻 Coding</h2>
+      <span class="badge mock" id="codingBadge">Mock</span>
+      <canvas id="codingChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>🤖 Agents</h2>
+      <span class="badge mock">Mock</span>
+      <canvas id="agentChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>🎨 Image Generation</h2>
+      <span class="badge mock">Mock</span>
+      <canvas id="imageChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>🎥 Video Generation</h2>
+      <span class="badge mock">Mock</span>
+      <canvas id="videoChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>📦 Robotics</h2>
+      <span class="badge mock">Mock</span>
+      <canvas id="roboticsChart" height="200"></canvas>
+    </div>
   </div>
 
   <script>
@@ -24,12 +63,36 @@
         type: 'bar',
         data: {
           labels: labels,
-          datasets: [{ label: 'Score', data: scores, backgroundColor: color }]
+          datasets: [{
+            label: 'Score',
+            data: scores,
+            backgroundColor: color
+          }]
         },
         options: {
           indexAxis: 'y',
-          scales: { x: { beginAtZero: true, max: 100 } },
-          plugins: { legend: { display: false } }
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: '#333'
+              },
+              ticks: {
+                color: '#ccc'
+              }
+            },
+            y: {
+              ticks: {
+                color: '#ccc'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
         }
       });
     };
