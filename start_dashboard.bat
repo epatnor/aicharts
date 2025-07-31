@@ -4,6 +4,13 @@ setlocal
 
 echo 🚀 Starting AICharts setup...
 
+:: Pull latest changes from GitHub
+echo 🔄 Pulling latest changes from GitHub...
+git pull || (
+    echo ❌ Failed to pull from GitHub
+    exit /b 1
+)
+
 :: Create and activate virtual environment if missing
 if exist venv\Scripts\activate.bat (
     call venv\Scripts\activate.bat
