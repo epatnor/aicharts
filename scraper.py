@@ -18,6 +18,7 @@ def timestamp():
 def scrape_epoch_reasoning():
     try:
         df = pd.read_csv("https://epoch.ai/data/all_ai_models.csv")
+        print("📋 Columns in CSV:", df.columns.tolist())  # 👈 Lägg tillfälligt denna rad
         df = df.dropna(subset=["MMLU"])
         top = df.sort_values("MMLU", ascending=False).head(5)
         return {
@@ -27,7 +28,8 @@ def scrape_epoch_reasoning():
         }
     except Exception as e:
         print(f"⚠️ Epoch MMLU failed: {e}")
-        raise
+        return fallback_reasoning()
+
 
 def scrape_epoch_coding():
     try:
