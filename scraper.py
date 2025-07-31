@@ -3,6 +3,7 @@
 import os
 import json
 import requests
+import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -12,37 +13,37 @@ os.makedirs(DATA_DIR, exist_ok=True)
 def timestamp():
     return datetime.utcnow().isoformat()
 
-# ========== LIVE SCRAPER: LLM Arena ==========
+# ========== EPOCH.AI CSV PARSER ==========
 
-# scraper.py (only the LLM part updated)
-
-def scrape_llm_arena():
+def scrape_epoch_reasoning():
     try:
-        url = "https://arena.lmsys.org/"
-        response = requests.get(url, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # New structure: top models are inside .leaderboard-container table rows
-        rows = soup.select("table tbody tr")
-        if not rows:
-            raise ValueError("No table rows found")
-
-        models, scores = [], []
-        for row in rows[:5]:
-            cols = row.find_all("td")
-            if len(cols) >= 3:
-                name = cols[1].get_text(strip=True)
-                score = float(cols[2].get_text(strip=True))
-                models.append(name)
-                scores.append(score)
-
-        return {"models": models, "scores": scores, "timestamp": timestamp()}
+        df = pd.read_csv("https://epoch.ai/data/all_ai_models.csv")
+        df = df.dropna(subset=["MMLU"])
+        top = df.sort_values("MMLU", ascending=False).head(5)
+        return {
+            "models": top["Model"].tolist(),
+            "scores": top["MMLU"].round(2).tolist(),
+            "timestamp": timestamp()
+        }
     except Exception as e:
-        print(f"⚠️ Failed to scrape LLM Arena: {e}")
-        return fallback_llm()
+        print(f"⚠️ Epoch MMLU failed: {e}")
+        return fallback_reasoning()
 
+def scrape_epoch_coding():
+    try:
+        df = pd.read_csv("https://epoch.ai/data/all_ai_models.csv")
+        df = df.dropna(subset=["HumanEval"])
+        top = df.sort_values("HumanEval", ascending=False).head(5)
+        return {
+            "models": top["Model"].tolist(),
+            "scores": top["HumanEval"].round(2).tolist(),
+            "timestamp": timestamp()
+        }
+    except Exception as e:
+        print(f"⚠️ Epoch HumanEval failed: {e}")
+        return fallback_coding()
 
-# ========== MOCK FALLBACKS FOR OTHER CATEGORIES ==========
+# ========== MOCK FALLBACKS ==========
 
 def fallback_llm():
     return {
@@ -51,19 +52,25 @@ def fallback_llm():
         "timestamp": timestamp()
     }
 
-def scrape_gpqa():
+def fallback_reasoning():
     return {
         "models": ["Gemini 2.5", "GPT-4o", "Claude Opus", "Yi-1.5", "Mistral-MoE"],
         "scores": [21.6, 20.3, 10.7, 9.8, 7.9],
         "timestamp": timestamp()
     }
 
-def scrape_livecode():
+def fallback_coding():
     return {
         "models": ["Claude Opus", "o1-mini", "Grok 4", "GPT-4 Turbo", "StarCoder2"],
         "scores": [88.2, 84.2, 81.9, 80.5, 77.0],
         "timestamp": timestamp()
     }
+
+def scrape_gpqa():
+    return fallback_reasoning()
+
+def scrape_livecode():
+    return fallback_coding()
 
 def scrape_bfcl():
     return {
@@ -71,6 +78,29 @@ def scrape_bfcl():
         "scores": [92.1, 89.5, 85.4, 83.2, 81.0],
         "timestamp": timestamp()
     }
+
+# ========== LLM Arena (still under test) ==========
+
+def scrape_llm_arena():
+    try:
+        url = "https://arena.lmsys.org/"
+        response = requests.get(url, timeout=10)
+        soup = BeautifulSoup(response.text, "html.parser")
+        rows = soup.select("table tbody tr")
+        if not rows:
+            raise ValueError("No table rows found")
+        models, scores = [], []
+        for row in rows[:5]:
+            cols = row.find_all("td")
+            if len(cols) >= 3:
+                name = cols[1].get_text(strip=True)
+                score = float(cols[2].get_text(strip=True))
+                models.append(name)
+                scores.append(score)
+        return {"models": models, "scores": scores, "timestamp": timestamp()}
+    except Exception as e:
+        print(f"⚠️ Failed to scrape LLM Arena: {e}")
+        return fallback_llm()
 
 # ========== WRITE TO FILE ==========
 
@@ -85,3 +115,5 @@ if __name__ == "__main__":
     save_json("gpqa", scrape_gpqa())
     save_json("livecode", scrape_livecode())
     save_json("bfcl", scrape_bfcl())
+    save_json("reasoning", scrape_epoch_reasoning())
+    save_json("coding", scrape_epoch_coding())
