@@ -18,17 +18,13 @@ def timestamp():
 def scrape_epoch_reasoning():
     try:
         df = pd.read_csv("https://epoch.ai/data/all_ai_models.csv")
-        print("\n📋 Available columns in Epoch CSV:")
-        for col in df.columns:
-            print(f"  - {col}")
-        print()
-        df = df.dropna(subset=["MMLU"])
-        top = df.sort_values("MMLU", ascending=False).head(5)
-        return {
-            "models": top["Model"].tolist(),
-            "scores": top["MMLU"].round(2).tolist(),
-            "timestamp": timestamp()
-        }
+
+        print("\n📋 First few rows of 'Benchmark data' column:\n")
+        for i, val in enumerate(df["Benchmark data"].dropna().head(5)):
+            print(f"{i+1}. {val}\n")
+
+        # Avbryt direkt efter debugutskrift
+        return fallback_reasoning()
     except Exception as e:
         print(f"⚠️ Epoch MMLU failed: {e}")
         return fallback_reasoning()
