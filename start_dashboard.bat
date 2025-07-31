@@ -2,53 +2,53 @@
 @echo off
 setlocal
 
+:: Gå till scriptets katalog
+cd /d %~dp0
+
 echo 🚀 Starting AICharts setup...
 
-:: Pull latest changes from GitHub
+:: Hämta senaste ändringar från GitHub
 echo 🔄 Pulling latest changes from GitHub...
 git pull || (
     echo ❌ Failed to pull from GitHub
     exit /b 1
 )
 
-:: Create and activate virtual environment if missing
-if exist venv\Scripts\activate.bat (
-    call venv\Scripts\activate.bat
-) else (
+:: Skapa och aktivera virtuell miljö om den saknas
+if not exist venv\Scripts\activate.bat (
     echo 📦 Creating virtual environment...
-    python -m venv venv
-    if exist venv\Scripts\activate.bat (
-        call venv\Scripts\activate.bat
-    ) else (
+    python -m venv venv || (
         echo ❌ Failed to create virtual environment
         exit /b 1
     )
 )
 
-:: Upgrade pip (silently)
+call venv\Scripts\activate.bat
+
+:: Uppgradera pip tyst
 python -m pip install --upgrade pip >nul
 
-:: Install required packages
+:: Installera beroenden
 echo 📦 Installing dependencies...
 pip install -r requirements.txt || (
     echo ❌ Failed to install packages
     exit /b 1
 )
 
-:: Run scraper to fetch latest benchmark data
+:: Kör scraper för att hämta senaste benchmarkdata
 echo 🧹 Running scraper...
 python scraper.py || (
     echo ❌ Scraper failed
     exit /b 1
 )
 
-:: Start backend server in a new console window
+:: Starta servern direkt (i samma fönster)
 echo 🌐 Starting server...
-start cmd /k "python server.py"
+python server.py
 
-:: Open dashboard in browser after delay
-timeout /t 2 >nul
-start http://localhost:8000
+:: (valfritt) Öppna webbläsaren efter 2 sekunder
+:: timeout /t 2 >nul
+:: start http://localhost:8000
 
 echo ✅ Done!
 endlocal
