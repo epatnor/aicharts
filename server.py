@@ -4,10 +4,10 @@ from flask import Flask, jsonify, send_from_directory
 import os
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')  # 👈 detta fixar CSS:en
+
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
-# Load a JSON file and return as response
 def load_json(name):
     path = os.path.join(DATA_DIR, f"{name}.json")
     if os.path.exists(path):
@@ -41,7 +41,7 @@ def bfcl():
 
 @app.route("/")
 def dashboard():
-    return send_from_directory(".", "index.html")
+    return send_from_directory(".", "index.html")  # funkar som innan
 
 if __name__ == "__main__":
     app.run(debug=False, port=8000)
