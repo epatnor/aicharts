@@ -1,13 +1,15 @@
 # server.py
 
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, render_template
 import os
 import json
 
-app = Flask(__name__, static_url_path='/static', static_folder='static')  # 👈 detta fixar CSS:en
+# ⬇️ Inkluderar static-mappen automatiskt (för CSS m.m.)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
+# ⬇️ Hjälpfunktion för att läsa JSON från fil
 def load_json(name):
     path = os.path.join(DATA_DIR, f"{name}.json")
     if os.path.exists(path):
@@ -15,6 +17,7 @@ def load_json(name):
             return json.load(f)
     return {"error": "Data not found"}
 
+# ⬇️ API-endpoints
 @app.route("/api/llm")
 def llm():
     return jsonify(load_json("llm"))
@@ -39,9 +42,11 @@ def livecode():
 def bfcl():
     return jsonify(load_json("bfcl"))
 
+# ⬇️ Renderar HTML från templates/index.html
 @app.route("/")
 def dashboard():
-    return send_from_directory(".", "index.html")  # funkar som innan
+    return render_template("index.html")
 
+# ⬇️ Startar servern
 if __name__ == "__main__":
     app.run(debug=False, port=8000)
