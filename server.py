@@ -4,12 +4,20 @@ from flask import Flask, jsonify, render_template
 import os
 import json
 
-# ⬇️ Inkluderar static-mappen automatiskt (för CSS m.m.)
-app = Flask(__name__, static_url_path='/static', static_folder='static')
+# 📁 Skapar Flask-appen
+# static_folder: var Flask hittar CSS, JS och bilder
+# template_folder: var Flask letar efter HTML-filer som ska renderas
+app = Flask(
+    __name__,
+    static_url_path='/static',
+    static_folder='static',
+    template_folder='templates'
+)
 
+# 📂 Mapp där JSON-filer med benchmarkdata sparas
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
-# ⬇️ Hjälpfunktion för att läsa JSON från fil
+# 📄 Läser in en viss JSON-fil från data-mappen
 def load_json(name):
     path = os.path.join(DATA_DIR, f"{name}.json")
     if os.path.exists(path):
@@ -17,7 +25,7 @@ def load_json(name):
             return json.load(f)
     return {"error": "Data not found"}
 
-# ⬇️ API-endpoints
+# 📡 API-endpoints – varje funktion returnerar innehållet i motsvarande JSON
 @app.route("/api/llm")
 def llm():
     return jsonify(load_json("llm"))
@@ -42,11 +50,11 @@ def livecode():
 def bfcl():
     return jsonify(load_json("bfcl"))
 
-# ⬇️ Renderar HTML från templates/index.html
+# 🌐 Huvudsidan – renderar templates/index.html
 @app.route("/")
 def dashboard():
     return render_template("index.html")
 
-# ⬇️ Startar servern
+# 🚀 Startar Flask-servern på port 8000
 if __name__ == "__main__":
     app.run(debug=False, port=8000)
