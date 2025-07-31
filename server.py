@@ -4,20 +4,19 @@ from flask import Flask, jsonify, render_template
 import os
 import json
 
-# 📁 Skapar Flask-appen
-# static_folder: var Flask hittar CSS, JS och bilder
-# template_folder: var Flask letar efter HTML-filer som ska renderas
-app = Flask(
-    __name__,
-    static_url_path='/static',
-    static_folder='static',
-    template_folder='templates'
-)
+# 🔧 Kontrollera var scriptet körs ifrån
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# 📂 Mapp där JSON-filer med benchmarkdata sparas
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+# 🚀 Flask-app med rätt paths
+app = Flask(__name__,
+            template_folder=TEMPLATE_DIR,
+            static_folder=STATIC_DIR,
+            static_url_path='/static')
 
-# 📄 Läser in en viss JSON-fil från data-mappen
+# 🔎 Läs JSON-data från /data
 def load_json(name):
     path = os.path.join(DATA_DIR, f"{name}.json")
     if os.path.exists(path):
@@ -25,7 +24,7 @@ def load_json(name):
             return json.load(f)
     return {"error": "Data not found"}
 
-# 📡 API-endpoints – varje funktion returnerar innehållet i motsvarande JSON
+# 🔌 API-endpoints
 @app.route("/api/llm")
 def llm():
     return jsonify(load_json("llm"))
@@ -50,11 +49,17 @@ def livecode():
 def bfcl():
     return jsonify(load_json("bfcl"))
 
-# 🌐 Huvudsidan – renderar templates/index.html
+# 🧪 Kontrollera att index.html hittas
 @app.route("/")
 def dashboard():
+    test_path = os.path.join(TEMPLATE_DIR, "index.html")
+    if not os.path.exists(test_path):
+        return f"❌ Hittar inte {test_path}", 500
     return render_template("index.html")
 
-# 🚀 Startar Flask-servern på port 8000
+# ▶️ Kör appen
 if __name__ == "__main__":
-    app.run(debug=False, port=8000)
+    print(f"✅ Körs från: {BASE_DIR}")
+    print(f"📁 Templates: {TEMPLATE_DIR}")
+    print(f"📁 Static:    {STATIC_DIR}")
+    app.run(debug=True, port=8000)
