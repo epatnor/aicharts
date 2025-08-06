@@ -1,7 +1,6 @@
 /* styles.css – modern dark theme for AICharts */
 
 :root {
-  /* definiera färgvariabler för mörkt tema */
   --bg: #0f1117;
   --surface: #1e222c;
   --card-border: #2c2f38;
@@ -61,16 +60,6 @@ header .subtitle {
   margin-bottom: 0.5rem;
 }
 
-.description {
-  font-size: 0.9rem;
-  color: var(--subtext);
-  margin-top: 0.5rem;
-}
-
-canvas {
-  margin-top: 1rem;
-}
-
 .badge {
   position: absolute;
   top: 1.5rem;
@@ -92,6 +81,49 @@ canvas {
   color: var(--subtext);
 }
 
+.chart-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.model-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 12px;
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.model-entry {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  gap: 0.5rem;
+  color: var(--text);
+}
+
+.model-entry img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+canvas {
+  flex-grow: 1;
+  max-width: calc(100% - 150px);
+  margin-top: 1rem;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: var(--subtext);
+  margin-top: 0.5rem;
+}
+
 footer {
   text-align: center;
   padding: 1rem;
@@ -101,5 +133,22 @@ footer {
 @media (max-width: 520px) {
   .container {
     padding: 1rem;
+  }
+
+  .chart-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .model-list {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-start;
+  }
+
+  canvas {
+    max-width: 100%;
   }
 }
