@@ -6,75 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AICharts – Live Benchmarks</title>
   <link rel="stylesheet" href="/static/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-  <style>
-    body {
-      background-color: #121212;
-      color: #eee;
-      font-family: system-ui, sans-serif;
-      padding: 20px;
-    }
-    header, footer {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-    }
-    .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.4);
-    }
-    .badge {
-      background: #444;
-      color: #fff;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      margin-left: 10px;
-    }
-    .badge.mock {
-      background: #c0392b;
-    }
-    .chart-row {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .model-list {
-      flex: 1;
-      min-width: 200px;
-    }
-    .model-entry {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .model-entry img {
-      height: 20px;
-      width: auto;
-    }
-    canvas {
-      flex: 2;
-      max-width: 600px;
-    }
-    .description {
-      margin-top: 12px;
-      font-size: 0.9rem;
-      color: #aaa;
-    }
-    .footer-note {
-      font-size: 0.8rem;
-      color: #666;
-    }
-  </style>
 </head>
 <body>
   <header>
@@ -83,54 +14,33 @@
   </header>
 
   <main class="container">
-    <!-- Benchmark cards -->
     <section class="card" id="generalCard">
-      <h2>🌐 General</h2>
-      <span class="badge" id="generalBadge">Loading...</span>
-      <div class="chart-row">
-        <div class="model-list" id="generalList"></div>
-        <canvas id="generalChart" height="200"></canvas>
-      </div>
+      <h2>🌐 General <span class="badge" id="generalBadge">Loading...</span></h2>
+      <div id="generalList"></div>
       <p class="description">Overall conversational capabilities across general chat benchmarks.</p>
     </section>
 
     <section class="card" id="reasoningCard">
-      <h2>📚 Reasoning</h2>
-      <span class="badge" id="reasoningBadge">Loading...</span>
-      <div class="chart-row">
-        <div class="model-list" id="reasoningList"></div>
-        <canvas id="reasoningChart" height="200"></canvas>
-      </div>
+      <h2>📚 Reasoning <span class="badge" id="reasoningBadge">Loading...</span></h2>
+      <div id="reasoningList"></div>
       <p class="description">Performance in logical and multi-step reasoning tasks like GPQA and ARC.</p>
     </section>
 
     <section class="card" id="mathCard">
-      <h2>🧮 Math (AIME)</h2>
-      <span class="badge" id="mathBadge">Loading...</span>
-      <div class="chart-row">
-        <div class="model-list" id="mathList"></div>
-        <canvas id="mathChart" height="200"></canvas>
-      </div>
+      <h2>🧮 Math (AIME) <span class="badge" id="mathBadge">Loading...</span></h2>
+      <div id="mathList"></div>
       <p class="description">Math problem-solving using AIME-like questions. Tests symbolic reasoning and accuracy.</p>
     </section>
 
     <section class="card" id="codingCard">
-      <h2>💻 Coding (SWE Bench)</h2>
-      <span class="badge" id="codingBadge">Loading...</span>
-      <div class="chart-row">
-        <div class="model-list" id="codingList"></div>
-        <canvas id="codingChart" height="200"></canvas>
-      </div>
+      <h2>💻 Coding (SWE Bench) <span class="badge" id="codingBadge">Loading...</span></h2>
+      <div id="codingList"></div>
       <p class="description">Code generation benchmarks such as HumanEval, SWE Bench, and LiveCode.</p>
     </section>
 
     <section class="card" id="tooluseCard">
-      <h2>🤖 Tool Use (BFCL)</h2>
-      <span class="badge" id="tooluseBadge">Loading...</span>
-      <div class="chart-row">
-        <div class="model-list" id="tooluseList"></div>
-        <canvas id="tooluseChart" height="200"></canvas>
-      </div>
+      <h2>🤖 Tool Use (BFCL) <span class="badge" id="tooluseBadge">Loading...</span></h2>
+      <div id="tooluseList"></div>
       <p class="description">Tool-augmented performance in real-world tasks, such as planning and API calls.</p>
     </section>
   </main>
@@ -159,62 +69,31 @@
       "Grok 1.5": "xai.png"
     };
 
-    function renderModelList(containerId, models) {
+    function renderBarList(containerId, models, scores) {
       const container = document.getElementById(containerId);
-      container.innerHTML = models.map(m => {
-        const logo = logoMap[m] || "";
-        return `<div class="model-entry"><img src="/static/${logo}" alt="">${m}</div>`;
+      container.innerHTML = models.map((model, i) => {
+        const score = scores[i];
+        const logo = logoMap[model] || "";
+        return `
+          <div class="model-row">
+            <div class="model-info">
+              <img src="/static/${logo}" alt="">
+              <span>${model}</span>
+            </div>
+            <div class="model-bar">
+              <div class="bar-fill" style="width:${score}%"></div>
+              <div class="bar-score">${score}</div>
+            </div>
+          </div>
+        `;
       }).join("");
     }
 
-    const makeChart = (id, labels, scores, color) => {
-      new Chart(document.getElementById(id), {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Score',
-            data: scores,
-            backgroundColor: color,
-            borderRadius: 6,
-            barThickness: 18
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          scales: {
-            x: {
-              beginAtZero: true,
-              max: 100,
-              grid: { color: '#333' },
-              ticks: { color: '#ccc' }
-            },
-            y: {
-              display: false
-            }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'left',  // moved to left so it doesn't cramp against right edge
-              color: '#eee',
-              font: { weight: 'bold', size: 12 },
-              formatter: val => `${val.toFixed(1)}`
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
-    };
-
-    async function loadDiscipline(name, endpoint, chartId, badgeId, color, listId) {
+    async function loadDiscipline(name, endpoint, badgeId, listId) {
       try {
         const res = await fetch(endpoint);
         const data = await res.json();
-        renderModelList(listId, data.models);
-        makeChart(chartId, data.models, data.scores, color);
+        renderBarList(listId, data.models, data.scores);
         document.getElementById(badgeId).innerText = 'Live';
         document.getElementById(badgeId).classList.remove('mock');
       } catch (err) {
@@ -224,12 +103,11 @@
       }
     }
 
-    // Load all
-    loadDiscipline('general', '/api/general', 'generalChart', 'generalBadge', '#4fc3f7', 'generalList');
-    loadDiscipline('reasoning', '/api/reasoning', 'reasoningChart', 'reasoningBadge', '#ffb74d', 'reasoningList');
-    loadDiscipline('math', '/api/math', 'mathChart', 'mathBadge', '#ffd54f', 'mathList');
-    loadDiscipline('coding', '/api/coding', 'codingChart', 'codingBadge', '#81c784', 'codingList');
-    loadDiscipline('tooluse', '/api/tooluse', 'tooluseChart', 'tooluseBadge', '#ba68c8', 'tooluseList');
+    loadDiscipline('general', '/api/general', 'generalBadge', 'generalList');
+    loadDiscipline('reasoning', '/api/reasoning', 'reasoningBadge', 'reasoningList');
+    loadDiscipline('math', '/api/math', 'mathBadge', 'mathList');
+    loadDiscipline('coding', '/api/coding', 'codingBadge', 'codingList');
+    loadDiscipline('tooluse', '/api/tooluse', 'tooluseBadge', 'tooluseList');
   </script>
 </body>
 </html>
