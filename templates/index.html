@@ -14,109 +14,76 @@
   </header>
 
   <div class="container">
-    <div class="card" id="llmCard">
-      <h2>🧠 Chat LLMs</h2>
-      <span class="badge" id="llmBadge">Loading...</span>
-      <canvas id="llmChart" height="200"></canvas>
+    <!-- General -->
+    <div class="card" id="generalCard">
+      <h2>🌐 General</h2>
+      <span class="badge" id="generalBadge">Loading...</span>
+      <canvas id="generalChart" height="200"></canvas>
     </div>
-
-    <div class="card">
+    <!-- Reasoning -->
+    <div class="card" id="reasoningCard">
       <h2>📚 Reasoning</h2>
-      <span class="badge mock" id="reasoningBadge">Mock</span>
+      <span class="badge" id="reasoningBadge">Mock</span>
       <canvas id="reasoningChart" height="200"></canvas>
     </div>
-
-    <div class="card">
-      <h2>💻 Coding</h2>
-      <span class="badge mock" id="codingBadge">Mock</span>
+    <!-- Math -->
+    <div class="card" id="mathCard">
+      <h2>🧮 Math (AIME)</h2>
+      <span class="badge" id="mathBadge">Loading...</span>
+      <canvas id="mathChart" height="200"></canvas>
+    </div>
+    <!-- Coding -->
+    <div class="card" id="codingCard">
+      <h2>💻 Coding (SWE Bench)</h2>
+      <span class="badge" id="codingBadge">Mock</span>
       <canvas id="codingChart" height="200"></canvas>
     </div>
-
-    <div class="card">
-      <h2>🤖 Agents</h2>
-      <span class="badge mock">Mock</span>
-      <canvas id="agentChart" height="200"></canvas>
-    </div>
-
-    <div class="card">
-      <h2>🎨 Image Generation</h2>
-      <span class="badge mock">Mock</span>
-      <canvas id="imageChart" height="200"></canvas>
-    </div>
-
-    <div class="card">
-      <h2>🎥 Video Generation</h2>
-      <span class="badge mock">Mock</span>
-      <canvas id="videoChart" height="200"></canvas>
-    </div>
-
-    <div class="card">
-      <h2>📦 Robotics</h2>
-      <span class="badge mock">Mock</span>
-      <canvas id="roboticsChart" height="200"></canvas>
+    <!-- Tool Use -->
+    <div class="card" id="tooluseCard">
+      <h2>🤖 Tool Use (BFCL)</h2>
+      <span class="badge" id="tooluseBadge">Mock</span>
+      <canvas id="tooluseChart" height="200"></canvas>
     </div>
   </div>
 
   <script>
+    // Function to build a bar chart
     const makeChart = (id, labels, scores, color) => {
       new Chart(document.getElementById(id), {
         type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Score',
-            data: scores,
-            backgroundColor: color
-          }]
-        },
+        data: { labels, datasets: [{ label: 'Score', data: scores, backgroundColor: color }] },
         options: {
           indexAxis: 'y',
           scales: {
-            x: {
-              beginAtZero: true,
-              max: 100,
-              grid: {
-                color: '#333'
-              },
-              ticks: {
-                color: '#ccc'
-              }
-            },
-            y: {
-              ticks: {
-                color: '#ccc'
-              }
-            }
+            x: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#ccc' } },
+            y: { ticks: { color: '#ccc' } }
           },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
+          plugins: { legend: { display: false } }
         }
       });
     };
 
-    fetch('/api/llm')
-      .then(res => res.json())
-      .then(data => {
-        makeChart('llmChart', data.models, data.scores, '#4fc3f7');
-        document.getElementById('llmBadge').innerText = 'Live';
-        document.getElementById('llmBadge').classList.remove('mock');
-      })
-      .catch(err => {
-        console.error('LLM fetch failed, fallback to mock', err);
-        makeChart('llmChart', ['GPT-4o', 'Claude 3.5', 'Gemini 1.5 Pro', 'DeepSeek-V2', 'Command R+'], [95, 93, 91, 89, 87], '#4fc3f7');
-        document.getElementById('llmBadge').innerText = 'Mock';
-        document.getElementById('llmBadge').classList.add('mock');
-      });
+    // Generic fetch & render logic
+    async function loadDiscipline(name, endpoint, chartId, badgeId, color) {
+      try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        makeChart(chartId, data.models, data.scores, color);
+        document.getElementById(badgeId).innerText = 'Live';
+        document.getElementById(badgeId).classList.remove('mock');
+      } catch (err) {
+        console.error(`Fetch failed for ${name}:`, err);
+        document.getElementById(badgeId).innerText = 'Mock';
+        document.getElementById(badgeId).classList.add('mock');
+      }
+    }
 
-    makeChart('reasoningChart', ['Gemini 2.5', 'GPT-4o', 'Claude Opus', 'Yi-1.5', 'Mistral-MoE'], [21.6, 20.3, 10.7, 9.8, 7.9], '#ffb74d');
-    makeChart('codingChart', ['Claude Opus', 'o1-mini', 'Grok 4', 'GPT-4 Turbo', 'StarCoder2'], [88.2, 84.2, 81.9, 80.5, 77.0], '#81c784');
-    makeChart('agentChart', ['Toolformer', 'Auto-GPT', 'GPT-Engineer', 'OpenDevin', 'Agent-1.5'], [62.3, 55.1, 59.2, 53.8, 51.6], '#ba68c8');
-    makeChart('imageChart', ['Janus Pro', 'DALL·E 3', 'SDXL Turbo', 'Playground V2.5', 'BlueWillow'], [89.2, 84.3, 80.1, 78.9, 75.2], '#f06292');
-    makeChart('videoChart', ['Sora (GPT-4V)', 'Pika Labs', 'Runway Gen-3', 'Dream Machine', 'Moonvalley'], [82.4, 76.9, 71.2, 68.5, 64.8], '#9575cd');
-    makeChart('roboticsChart', ['RoboCat', 'RT-2', 'SayCan', 'PaLM-E', 'Open-X Embodied'], [45.3, 42.1, 38.6, 36.7, 34.4], '#7986cb');
+    // Load all disciplines with corresponding charts/colors
+    loadDiscipline('general', '/api/general', 'generalChart', 'generalBadge', '#4fc3f7');
+    loadDiscipline('reasoning', '/api/reasoning', 'reasoningChart', 'reasoningBadge', '#ffb74d');
+    loadDiscipline('math', '/api/math', 'mathChart', 'mathBadge', '#ffd54f');
+    loadDiscipline('coding', '/api/coding', 'codingChart', 'codingBadge', '#81c784');
+    loadDiscipline('tooluse', '/api/tooluse', 'tooluseChart', 'tooluseBadge', '#ba68c8');
   </script>
 </body>
 </html>
