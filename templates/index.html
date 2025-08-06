@@ -8,6 +8,73 @@
   <link rel="stylesheet" href="/static/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <style>
+    body {
+      background-color: #121212;
+      color: #eee;
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+    }
+    header, footer {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .card {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
+    .badge {
+      background: #444;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+    .badge.mock {
+      background: #c0392b;
+    }
+    .chart-row {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .model-list {
+      flex: 1;
+      min-width: 200px;
+    }
+    .model-entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .model-entry img {
+      height: 20px;
+      width: auto;
+    }
+    canvas {
+      flex: 2;
+      max-width: 600px;
+    }
+    .description {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .footer-note {
+      font-size: 0.8rem;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -16,7 +83,7 @@
   </header>
 
   <main class="container">
-    <!-- Cards -->
+    <!-- Benchmark cards -->
     <section class="card" id="generalCard">
       <h2>🌐 General</h2>
       <span class="badge" id="generalBadge">Loading...</span>
@@ -73,27 +140,25 @@
   </footer>
 
   <script>
-    // Model name to logo map
     const logoMap = {
-      "GPT-4o": "openai.svg",
-      "GPT-4 Turbo": "openai.svg",
-      "GPT-4-Opus": "openai.svg",
-      "Claude 3.5": "anthropic-color.svg",
-      "Claude Opus": "anthropic-color.svg",
-      "Claude 3 Opus": "anthropic-color.svg",
-      "Gemini 1.5": "google-brand-color.svg",
-      "Gemini 2.5": "google-brand-color.svg",
-      "DeepSeek": "deepseek-color.svg",
-      "Command R+": "openai.svg",
-      "Yi-1.5": "mistral-color.svg",
-      "Mistral-MoE": "mistral-color.svg",
-      "o1-mini": "mistral-color.svg",
-      "StarCoder2": "mistral-color.svg",
-      "Grok 4": "xai.svg",
-      "Grok 1.5": "xai.svg"
+      "GPT-4o": "openai.png",
+      "GPT-4 Turbo": "openai.png",
+      "GPT-4-Opus": "openai.png",
+      "Claude 3.5": "anthropic.png",
+      "Claude Opus": "anthropic.png",
+      "Claude 3 Opus": "anthropic.png",
+      "Gemini 1.5": "google-brand.png",
+      "Gemini 2.5": "google-brand.png",
+      "DeepSeek": "deepseek-color.png",
+      "Command R+": "openai.png",
+      "Yi-1.5": "mistral-color.png",
+      "Mistral-MoE": "mistral-color.png",
+      "o1-mini": "mistral-color.png",
+      "StarCoder2": "mistral-color.png",
+      "Grok 4": "xai.png",
+      "Grok 1.5": "xai.png"
     };
 
-    // Insert logos beside names
     function renderModelList(containerId, models) {
       const container = document.getElementById(containerId);
       container.innerHTML = models.map(m => {
@@ -102,7 +167,6 @@
       }).join("");
     }
 
-    // Build horizontal chart
     const makeChart = (id, labels, scores, color) => {
       new Chart(document.getElementById(id), {
         type: 'bar',
@@ -134,7 +198,7 @@
             tooltip: { enabled: false },
             datalabels: {
               anchor: 'end',
-              align: 'right',
+              align: 'left',  // moved to left so it doesn't cramp against right edge
               color: '#eee',
               font: { weight: 'bold', size: 12 },
               formatter: val => `${val.toFixed(1)}`
@@ -145,7 +209,6 @@
       });
     };
 
-    // Load each section
     async function loadDiscipline(name, endpoint, chartId, badgeId, color, listId) {
       try {
         const res = await fetch(endpoint);
