@@ -16,7 +16,7 @@
   </header>
 
   <main class="container">
-    <!-- Card Template -->
+    <!-- Cards -->
     <section class="card" id="generalCard">
       <h2>🌐 General</h2>
       <span class="badge" id="generalBadge">Loading...</span>
@@ -73,7 +73,7 @@
   </footer>
 
   <script>
-    // Modellnamn → Företagslogga
+    // Model name to logo map
     const logoMap = {
       "GPT-4o": "openai.svg",
       "GPT-4 Turbo": "openai.svg",
@@ -93,6 +93,7 @@
       "Grok 1.5": "xai.svg"
     };
 
+    // Insert logos beside names
     function renderModelList(containerId, models) {
       const container = document.getElementById(containerId);
       container.innerHTML = models.map(m => {
@@ -101,6 +102,7 @@
       }).join("");
     }
 
+    // Build horizontal chart
     const makeChart = (id, labels, scores, color) => {
       new Chart(document.getElementById(id), {
         type: 'bar',
@@ -143,6 +145,7 @@
       });
     };
 
+    // Load each section
     async function loadDiscipline(name, endpoint, chartId, badgeId, color, listId) {
       try {
         const res = await fetch(endpoint);
@@ -158,6 +161,7 @@
       }
     }
 
+    // Load all
     loadDiscipline('general', '/api/general', 'generalChart', 'generalBadge', '#4fc3f7', 'generalList');
     loadDiscipline('reasoning', '/api/reasoning', 'reasoningChart', 'reasoningBadge', '#ffb74d', 'reasoningList');
     loadDiscipline('math', '/api/math', 'mathChart', 'mathBadge', '#ffd54f', 'mathList');
