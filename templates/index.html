@@ -54,13 +54,13 @@
     function detectCompany(modelName) {
       const name = modelName.toLowerCase();
       if (name.includes("gpt") || name.includes("openai")) return "openai.png";
-      if (name.includes("gemini") || name.includes("bard") || name.includes("google")) return "google.png";
+      if (name.includes("gemini") || name.includes("bard") || name.includes("google")) return "google-color.png";
       if (name.includes("claude") || name.includes("anthropic")) return "anthropic.png";
       if (name.includes("grok") || name.includes("xai")) return "xai.png";
       if (name.includes("mistral") || name.includes("mixtral")) return "mistral.png";
-      if (name.includes("llama") || name.includes("meta")) return "meta.png";
+      if (name.includes("llama") || name.includes("meta")) return "meta-brand-color.png";
       if (name.includes("command") || name.includes("cohere")) return "cohere.png";
-      if (name.includes("qwen") || name.includes("tiangong") || name.includes("alibaba")) return "alibaba.png";
+      if (name.includes("qwen") || name.includes("tiangong") || name.includes("alibaba")) return "alibaba-brand.png";
       if (name.includes("yi") || name.includes("01-ai")) return "01ai.png";
       if (name.includes("deepseek")) return "deepseek-color.png";
       return "artificial-intelligence.png"; // fallback
