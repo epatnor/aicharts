@@ -50,35 +50,28 @@
   </footer>
 
   <script>
-    const logoMap = {
-      "GPT-4o": "openai.png",
-      "GPT-4 Turbo": "openai.png",
-      "GPT-4-Opus": "openai.png",
-      "Claude 3.5": "anthropic.png",
-      "Claude Opus": "anthropic.png",
-      "Claude 3 Opus": "anthropic.png",
-      "Gemini 1.5": "google-color.png",
-      "Gemini 2.5": "google-color.png",
-      "DeepSeek": "deepseek-color.png",
-      "Command R+": "artificial-intelligence.png",   // fallback
-      "Yi-1.5": "artificial-intelligence.png",        // fallback
-      "Mistral-MoE": "mistral-color.png",
-      "o1-mini": "artificial-intelligence.png",       // fallback
-      "StarCoder2": "artificial-intelligence.png",    // fallback
-      "Grok 4": "xai.png",
-      "Grok 1.5": "xai.png"
-    };
+    // Automatisk logotypdetektering baserat på modellnamn
+    function detectCompany(modelName) {
+      const name = modelName.toLowerCase();
+      if (name.includes("gpt") || name.includes("openai")) return "openai.png";
+      if (name.includes("gemini") || name.includes("bard") || name.includes("google")) return "google.png";
+      if (name.includes("claude") || name.includes("anthropic")) return "anthropic.png";
+      if (name.includes("grok") || name.includes("xai")) return "xai.png";
+      if (name.includes("mistral") || name.includes("mixtral")) return "mistral.png";
+      if (name.includes("llama") || name.includes("meta")) return "meta.png";
+      if (name.includes("command") || name.includes("cohere")) return "cohere.png";
+      if (name.includes("qwen") || name.includes("tiangong") || name.includes("alibaba")) return "alibaba.png";
+      if (name.includes("yi") || name.includes("01-ai")) return "01ai.png";
+      if (name.includes("deepseek")) return "deepseek-color.png";
+      return "artificial-intelligence.png"; // fallback
+    }
 
-
+    // Rendera modeller med autodetekterade loggor
     function renderBarList(containerId, models, scores) {
       const container = document.getElementById(containerId);
       container.innerHTML = models.map((model, i) => {
         const score = scores[i];
-        let logo = logoMap[model];
-        if (!logo) {
-          console.warn("⚠️ Saknar logga för modell:", model);
-          logo = "artificial-intelligence.png";
-        }
+        const logo = detectCompany(model);
         return `
           <div class="model-row">
             <div class="model-info">
@@ -94,7 +87,7 @@
       }).join("");
     }
 
-
+    // Hämtar varje disciplin
     async function loadDiscipline(name, endpoint, badgeId, listId) {
       try {
         const res = await fetch(endpoint);
@@ -109,6 +102,7 @@
       }
     }
 
+    // Init
     loadDiscipline('general', '/api/general', 'generalBadge', 'generalList');
     loadDiscipline('reasoning', '/api/reasoning', 'reasoningBadge', 'reasoningList');
     loadDiscipline('math', '/api/math', 'mathBadge', 'mathList');
