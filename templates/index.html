@@ -60,20 +60,25 @@
       "Gemini 1.5": "google-brand.png",
       "Gemini 2.5": "google-brand.png",
       "DeepSeek": "deepseek-color.png",
-      "Command R+": "openai.png",
-      "Yi-1.5": "mistral-color.png",
+      "Command R+": "artificial-intelligence.png",   // fallback
+      "Yi-1.5": "artificial-intelligence.png",        // fallback
       "Mistral-MoE": "mistral-color.png",
-      "o1-mini": "mistral-color.png",
-      "StarCoder2": "mistral-color.png",
+      "o1-mini": "artificial-intelligence.png",       // fallback
+      "StarCoder2": "artificial-intelligence.png",    // fallback
       "Grok 4": "xai.png",
       "Grok 1.5": "xai.png"
     };
+
 
     function renderBarList(containerId, models, scores) {
       const container = document.getElementById(containerId);
       container.innerHTML = models.map((model, i) => {
         const score = scores[i];
-        const logo = logoMap[model] || "";
+        let logo = logoMap[model];
+        if (!logo) {
+          console.warn("⚠️ Saknar logga för modell:", model);
+          logo = "artificial-intelligence.png";
+        }
         return `
           <div class="model-row">
             <div class="model-info">
@@ -88,6 +93,7 @@
         `;
       }).join("");
     }
+
 
     async function loadDiscipline(name, endpoint, badgeId, listId) {
       try {
