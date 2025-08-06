@@ -11,59 +11,83 @@
 <body>
   <header>
     <h1>📊 AICharts – Live AI Benchmarks</h1>
+    <p class="subtitle">Tracking the top-performing models across disciplines in real-time.</p>
   </header>
 
-  <div class="container">
-    <!-- General -->
-    <div class="card" id="generalCard">
+  <main class="container">
+    <!-- Card Template -->
+    <section class="card" id="generalCard">
       <h2>🌐 General</h2>
       <span class="badge" id="generalBadge">Loading...</span>
       <canvas id="generalChart" height="200"></canvas>
-    </div>
-    <!-- Reasoning -->
-    <div class="card" id="reasoningCard">
+      <p class="description">Overall conversational capabilities across general chat benchmarks.</p>
+    </section>
+
+    <section class="card" id="reasoningCard">
       <h2>📚 Reasoning</h2>
-      <span class="badge" id="reasoningBadge">Mock</span>
+      <span class="badge" id="reasoningBadge">Loading...</span>
       <canvas id="reasoningChart" height="200"></canvas>
-    </div>
-    <!-- Math -->
-    <div class="card" id="mathCard">
+      <p class="description">Performance in logical and multi-step reasoning tasks like GPQA and ARC.</p>
+    </section>
+
+    <section class="card" id="mathCard">
       <h2>🧮 Math (AIME)</h2>
       <span class="badge" id="mathBadge">Loading...</span>
       <canvas id="mathChart" height="200"></canvas>
-    </div>
-    <!-- Coding -->
-    <div class="card" id="codingCard">
+      <p class="description">Math problem-solving using AIME-like questions. Tests symbolic reasoning and accuracy.</p>
+    </section>
+
+    <section class="card" id="codingCard">
       <h2>💻 Coding (SWE Bench)</h2>
-      <span class="badge" id="codingBadge">Mock</span>
+      <span class="badge" id="codingBadge">Loading...</span>
       <canvas id="codingChart" height="200"></canvas>
-    </div>
-    <!-- Tool Use -->
-    <div class="card" id="tooluseCard">
+      <p class="description">Code generation benchmarks such as HumanEval, SWE Bench, and LiveCode.</p>
+    </section>
+
+    <section class="card" id="tooluseCard">
       <h2>🤖 Tool Use (BFCL)</h2>
-      <span class="badge" id="tooluseBadge">Mock</span>
+      <span class="badge" id="tooluseBadge">Loading...</span>
       <canvas id="tooluseChart" height="200"></canvas>
-    </div>
-  </div>
+      <p class="description">Tool-augmented performance in real-world tasks, such as planning and API calls.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p class="footer-note">Updated daily • Mock values shown if live data fails</p>
+  </footer>
 
   <script>
-    // Function to build a bar chart
     const makeChart = (id, labels, scores, color) => {
       new Chart(document.getElementById(id), {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Score', data: scores, backgroundColor: color }] },
+        data: {
+          labels,
+          datasets: [{
+            label: 'Score',
+            data: scores,
+            backgroundColor: color
+          }]
+        },
         options: {
           indexAxis: 'y',
           scales: {
-            x: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#ccc' } },
-            y: { ticks: { color: '#ccc' } }
+            x: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: '#333' },
+              ticks: { color: '#ccc' }
+            },
+            y: {
+              ticks: { color: '#ccc' }
+            }
           },
-          plugins: { legend: { display: false } }
+          plugins: {
+            legend: { display: false }
+          }
         }
       });
     };
 
-    // Generic fetch & render logic
     async function loadDiscipline(name, endpoint, chartId, badgeId, color) {
       try {
         const res = await fetch(endpoint);
@@ -78,7 +102,6 @@
       }
     }
 
-    // Load all disciplines with corresponding charts/colors
     loadDiscipline('general', '/api/general', 'generalChart', 'generalBadge', '#4fc3f7');
     loadDiscipline('reasoning', '/api/reasoning', 'reasoningChart', 'reasoningBadge', '#ffb74d');
     loadDiscipline('math', '/api/math', 'mathChart', 'mathBadge', '#ffd54f');
